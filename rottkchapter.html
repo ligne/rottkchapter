@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <style>
+        .pass:before {
+            content: 'PASS: ';
+            color:  blue;
+            font-weight: bold;
+        }
+        .fail:before {
+            content: 'FAIL: ';
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="chapter"></div>
+    <ul id="tests"></ul>
+
+    <script type="text/javascript">
+      function chapter(doy) {
+        c = (doy +1) / 3
+        return c.toFixed(0)
+      }
+
+      Date.prototype.dayofYear = function() {
+          var d = new Date(this.getFullYear(), 0, 0);
+          return Math.floor((this-d)/8.64e+7);  // magic number is ms in one day
+      }
+
+      document.getElementById("chapter").innerHTML = new Date().toLocaleDateString()
+                                                   + ': Chapter '
+                                                   + chapter(new Date().dayofYear());
+
+      /* self-test */
+      var output = document.getElementById('tests');
+      var failed = 0
+      function is(got, expected, description ) {
+          var li = document.createElement('li');
+
+          if (got == expected) {
+            li.className = 'pass'
+          }
+          else {
+            li.className = 'fail';
+            failed = 1
+          }
+          li.appendChild(document.createTextNode(got + ' == ' + expected + ': ' + description));
+          output.appendChild(li);
+      }
+      function done_testing() {
+          if (!failed) {
+            output.style.display = 'none'
+          }
+      }
+
+      // chapter change happens in the right place
+      is(chapter(1), 1, 'day 1')
+      is(chapter(2), 1, 'day 2')
+      is(chapter(3), 1, 'day 3')
+      is(chapter(4), 2, 'day 4')
+
+      // later on
+      is(chapter(70), 24, 'day 70')
+      is(chapter(72), 24, 'day 72')
+      is(chapter(73), 25, 'day 73')
+
+      // end of the year
+      is(chapter(360), 120, 'day 360')
+
+      // finish off
+      done_testing()
+    </script>
+
+  </body>
+</html>
