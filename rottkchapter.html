@@ -16,12 +16,31 @@
     </style>
   </head>
   <body>
+    <div id="date"></div>
+    <br />
     <div id="chapter"></div>
+    <br />
+    <div id="next_st"></div>
+    <br />
+    <p>Chapter first lines:
+      <a href="https://www.facebook.com/groups/544091915620975/permalink/544091922287641/?comment_id=547167885313378">Chapters 1-60</a>;&nbsp;
+      <a href="https://www.facebook.com/groups/544091915620975/permalink/544091922287641/?comment_id=547168161980017">Chapters 61-120</a>
+    </p>
+    <p>
+      <a href="https://www.facebook.com/groups/544091915620975/permalink/544091922287641/?comment_id=547178741978959">Big long date list thing</a>
+    </p>
+    <br />
     <ul id="tests"></ul>
 
     <script type="text/javascript">
       function chapter(doy) {
-        c = (doy +1) / 3
+        c = (doy + 1) / 3
+        return c.toFixed(0)
+      }
+
+      function next_chapter_starts(doy) {
+        doy += 2
+        c = (doy - doy % 3) + 1
         return c.toFixed(0)
       }
 
@@ -30,9 +49,16 @@
           return Math.floor((this-d)/8.64e+7);  // magic number is ms in one day
       }
 
-      document.getElementById("chapter").innerHTML = new Date().toLocaleDateString()
-                                                   + ': Chapter '
-                                                   + chapter(new Date().dayofYear());
+      Date.prototype.fromDayofYear = function(n) {
+          var d = new Date('2013', 0, 1);
+          return new Date(d.setMonth(0, n));
+      }
+
+      today = new Date();
+      doy = today.dayofYear();
+      document.getElementById("date")   .innerHTML = 'Date: ' + today.toLocaleDateString();
+      document.getElementById("chapter").innerHTML = 'Current chapter: ' + chapter(doy)
+      document.getElementById("next_st").innerHTML = 'Next chapter starts: ' + new Date().fromDayofYear(next_chapter_starts(doy)).toLocaleDateString()
 
       /* self-test */
       var output = document.getElementById('tests');
@@ -57,18 +83,18 @@
       }
 
       // chapter change happens in the right place
-      is(chapter(1), 1, 'day 1')
-      is(chapter(2), 1, 'day 2')
-      is(chapter(3), 1, 'day 3')
-      is(chapter(4), 2, 'day 4')
+      is(chapter(1), 1, 'day 1, current chapter');  is(next_chapter_starts(1), 4, 'day 1, next chapter starts');
+      is(chapter(2), 1, 'day 2, current chapter');  is(next_chapter_starts(2), 4, 'day 2, next chapter starts');
+      is(chapter(3), 1, 'day 3, current chapter');  is(next_chapter_starts(3), 4, 'day 3, next chapter starts');
+      is(chapter(4), 2, 'day 4, current chapter');  is(next_chapter_starts(4), 7, 'day 4, next chapter starts');
 
       // later on
-      is(chapter(70), 24, 'day 70')
-      is(chapter(72), 24, 'day 72')
-      is(chapter(73), 25, 'day 73')
+      is(chapter(70), 24, 'day 70, current chapter');  is(next_chapter_starts(70), 73, 'day 4, next chapter starts');
+      is(chapter(72), 24, 'day 72, current chapter');  is(next_chapter_starts(72), 73, 'day 4, next chapter starts');
+      is(chapter(73), 25, 'day 73, current chapter');  is(next_chapter_starts(73), 76, 'day 4, next chapter starts');
 
       // end of the year
-      is(chapter(360), 120, 'day 360')
+      is(chapter(360), 120, 'day 360, current chapter');  is(next_chapter_starts(360), 361, 'day 4, next chapter starts');
 
       // finish off
       done_testing()
